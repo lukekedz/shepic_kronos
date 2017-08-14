@@ -1,4 +1,11 @@
+require 'logger'
 require 'httparty'
+
+require_relative 'prettify_log_output'
+stamp     = Time.new.strftime('%Y%m%d%H%M')
+log       = Logger.new("./logger/log_#{stamp}.txt", 10, 1024000)
+log.level = Logger::INFO
+output    = PrettifyLogOutput.new
 
 # TODO: retry if URL doesn't resolve, on GET and POST
 # TODO: implement emailing
@@ -15,24 +22,25 @@ todays_date      = Date.today
 game_sched_today = false
 now              = military_time_now()
 
-puts
-puts "Today: " + todays_date.to_s
-puts "Start: " + now.to_s
-puts
+log.info output.start
+log.info output.new_line
+log.info "Today: " + todays_date.to_s
+log.info "Start: " + now.to_s
+log.info output.new_line
 
-# game_slate = HTTParty.get('http://localhost:3000/admin/active_game_slate', :body => { :secret => ARGV[0] })
-game_slate = HTTParty.get('https://shepic.herokuapp.com/admin/active_game_slate', :body => { :secret => ARGV[0] })
+game_slate = HTTParty.get('http://localhost:3000/admin/active_game_slate', :body => { :secret => ARGV[0] })
+# game_slate = HTTParty.get('https://shepic.herokuapp.com/admin/active_game_slate', :body => { :secret => ARGV[0] })
 
 if game_slate.parsed_response != nil
 
   game_slate.each_with_index do |game, index|
-    puts "INDEX: " + index.to_s
+    log.info "INDEX: " + index.to_s
 
     game_date = game_date(game['date'])
 
     if game_date == todays_date
-      puts "Game(s) scheduled for today... #{todays_date}!"
-      puts
+      log.info "Game(s) scheduled for today... #{todays_date}!"
+      log.info output.new_line
 
       game_sched_today = true
       break
@@ -45,8 +53,8 @@ if game_slate.parsed_response != nil
       game_started = game['game_started']
       game_time    = game['start_time'].to_i
 
-      puts 'ID: ' + game['id'].to_s + ' => ' + game['away'] + ' vs. ' + game['home']
-      puts game['date'].to_s[0..9] + ' ' + game['start_time'].to_s
+      log.info 'ID: ' + game['id'].to_s + ' => ' + game['away'] + ' vs. ' + game['home']
+      log.info game['date'].to_s[0..9] + ' ' + game['start_time'].to_s
 
       if game_date == todays_date && game_started == false
         while game_time > now
@@ -54,15 +62,14 @@ if game_slate.parsed_response != nil
           now = military_time_now()
         end
 
-        # updated_game_record = HTTParty.post('http://localhost:3000/admin/game_started', :body => { :id => game['id'], :secret => ARGV[0] })
-        updated_game_record = HTTParty.post('https://shepic.herokuapp.com/admin/game_started', :body => { :id => game['id'], :secret => ARGV[0] })
-        puts '*****'
-        puts 'NOW: ' + now.to_s
-        puts 'GAME ID: ' + updated_game_record.parsed_response['id'].to_s + ' => started... ' + updated_game_record.parsed_response['game_started'].to_s
-        puts '*****'
+        updated_game_record = HTTParty.post('http://localhost:3000/admin/game_started', :body => { :id => game['id'], :secret => ARGV[0] })
+        # updated_game_record = HTTParty.post('https://shepic.herokuapp.com/admin/game_started', :body => { :id => game['id'], :secret => ARGV[0] })
+        log.info '*****'
+        log.info 'NOW: ' + now.to_s
+        log.info 'GAME ID: ' + updated_game_record.parsed_response['id'].to_s + ' => started... ' + updated_game_record.parsed_response['game_started'].to_s
+        log.info '*****'
       end
-
-      puts
+      log.info output.new_line
     end
   end
 
