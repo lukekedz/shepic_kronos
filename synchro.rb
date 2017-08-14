@@ -9,6 +9,7 @@ output    = PrettifyLogOutput.new
 
 # TODO: retry if URL doesn't resolve, on GET and POST
 # TODO: implement emailing
+# TODO: automatic environment detection (no manual switch from localhost to herokuapp.com)
 
 def game_date(date)
   Date.new(date.to_s[0..3].to_i, date.to_s[5..6].to_i, date.to_s[8..9].to_i)
@@ -28,8 +29,8 @@ log.info "Today: " + todays_date.to_s
 log.info "Start: " + now.to_s
 log.info output.new_line
 
-game_slate = HTTParty.get('http://localhost:3000/admin/active_game_slate', :body => { :secret => ARGV[0] })
-# game_slate = HTTParty.get('https://shepic.herokuapp.com/admin/active_game_slate', :body => { :secret => ARGV[0] })
+# game_slate = HTTParty.get('http://localhost:3000/admin/active_game_slate', :body => { :secret => ARGV[0] })
+game_slate = HTTParty.get('https://shepic.herokuapp.com/admin/active_game_slate', :body => { :secret => ARGV[0] })
 
 if game_slate.parsed_response != nil
 
@@ -62,8 +63,8 @@ if game_slate.parsed_response != nil
           now = military_time_now()
         end
 
-        updated_game_record = HTTParty.post('http://localhost:3000/admin/game_started', :body => { :id => game['id'], :secret => ARGV[0] })
-        # updated_game_record = HTTParty.post('https://shepic.herokuapp.com/admin/game_started', :body => { :id => game['id'], :secret => ARGV[0] })
+        # updated_game_record = HTTParty.post('http://localhost:3000/admin/game_started', :body => { :id => game['id'], :secret => ARGV[0] })
+        updated_game_record = HTTParty.post('https://shepic.herokuapp.com/admin/game_started', :body => { :id => game['id'], :secret => ARGV[0] })
         log.info '*****'
         log.info 'NOW: ' + now.to_s
         log.info 'GAME ID: ' + updated_game_record.parsed_response['id'].to_s + ' => started... ' + updated_game_record.parsed_response['game_started'].to_s
