@@ -31,6 +31,9 @@ log.info output.new_line
 
 # game_slate = HTTParty.get('http://localhost:3000/admin/active_game_slate', :body => { :secret => ARGV[0] })
 game_slate = HTTParty.get('https://shepic.herokuapp.com/admin/active_game_slate', :body => { :secret => ARGV[0] })
+log.info 'SHEPIC RESPONSE:'
+log.info game_slate.inspect
+log.info output.new_line
 
 if game_slate.parsed_response != nil
 
