@@ -3,6 +3,6 @@
 
 set :chronic_options, :hours24 => true
 
-every 1.day, :at => '17:21' do
+every 1.day, :at => '08:00' do
   rake 'connect:sync'
 end
