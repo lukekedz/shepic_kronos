@@ -38,10 +38,12 @@ log.info output.new_line
 if game_slate && game_slate.parsed_response != nil
 
   game_slate.each_with_index do |game, index|
-    log.info "INDEX: " + index.to_s
-    log.info game_date(game['date']).to_s + " " + game['away'].to_s + " vs. " + game['home'].to_s
-
     game_date = game_date(game['date'])
+
+    log.info "INDEX: " + index.to_s
+    log.info game_date.to_s + " " + game['start_time'].to_s
+    log.info game['away'].to_s + " vs. " + game['home'].to_s
+    log.info output.new_line
 
     if game_date == todays_date
       log.info "Game(s) scheduled for today... #{todays_date}!"
