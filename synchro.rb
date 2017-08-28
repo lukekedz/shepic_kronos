@@ -50,6 +50,7 @@ if game_slate && game_slate.parsed_response != nil
       log.info output.new_line
 
       game_sched_today = true
+      system "echo 'games scheduled today.' | mail -s 'Raspi Shepic Log File' lukekedziora@gmail.com -A logger/log_#{stamp}.txt"
       break
     end
   end
@@ -75,14 +76,14 @@ if game_slate && game_slate.parsed_response != nil
         log.info 'NOW: ' + now.to_s
         log.info 'GAME ID: ' + updated_game_record.parsed_response['id'].to_s + ' => started... ' + updated_game_record.parsed_response['game_started'].to_s
         log.info '*****'
-
-        system "echo 'game locked.' | mail -s 'Notice from Shepic!' lukekedziora@gmail.com -A logger/log_#{stamp}.txt"
       end
       log.info output.new_line
+
+      system "echo 'games locked.' | mail -s 'Raspi Shepic Log File' lukekedziora@gmail.com -A logger/log_#{stamp}.txt"
     end
   else
-    system "echo 'no games scheduled today!' | mail -s 'Notice from Shepic!' lukekedziora@gmail.com -A logger/log_#{stamp}.txt"
+    system "echo 'no games scheduled today!' | mail -s 'Raspi Shepic Log File' lukekedziora@gmail.com -A logger/log_#{stamp}.txt"
   end
 else
-  system "echo 'game_slate is nil!' | mail -s 'Notice from Shepic!' lukekedziora@gmail.com -A logger/log_#{stamp}.txt"
+  system "echo 'game_slate is nil!' | mail -s 'Raspi Shepic Log File' lukekedziora@gmail.com -A logger/log_#{stamp}.txt"
 end
