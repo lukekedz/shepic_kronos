@@ -35,10 +35,11 @@ log.info 'SHEPIC RESPONSE:'
 log.info game_slate.inspect
 log.info output.new_line
 
-if game_slate.parsed_response != nil
+if game_slate && game_slate.parsed_response != nil
 
   game_slate.each_with_index do |game, index|
     log.info "INDEX: " + index.to_s
+    log.info game_date(game['date']).to_s + " " + game['away'].to_s + " vs. " + game['home'].to_s
 
     game_date = game_date(game['date'])
 
