@@ -56,6 +56,8 @@ if game_slate && game_slate.parsed_response != nil
   end
 
   if game_sched_today
+    system "echo ruby live_scoring.rb #{ENV['ANYONG']}"
+
     game_slate.each do |game|
       game_date    = game_date(game['date'])
       game_started = game['game_started']
