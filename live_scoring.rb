@@ -2,6 +2,8 @@ require 'httparty'
 require 'nokogiri'
 require 'rufus-scheduler'
 
+system "echo 'live scoring running!' | mail -s 'Kronos Live Scoring' lukekedziora@gmail.com"
+
 def strip_RZ_from_team_name(team_name)
   # example 'OSURZ'
   team_name[-2..-1] == 'RZ' ? team_name[0..-3] : team_name
@@ -38,7 +40,6 @@ scheduler = Rufus::Scheduler.new
 scheduler.every '5m', :first_in => 0 do
   puts
   puts '*'*100
-  system "echo 'live scoring running!' | mail -s 'Kronos Live Scoring' lukekedziora@gmail.com"
 
   scrape = HTTParty.get("https://sports.yahoo.com/college-football/scoreboard/?confId=1%2C4%2C6%2C7%2C8%2C11%2C71%2C72%2C87%2C90%2C122&schedState=2&dateRange=#{active_week['week']}")
   live_html_elements = Nokogiri::HTML(scrape).css('#scoreboard-group-2 div ul li').css('div')
@@ -153,6 +154,7 @@ scheduler.every '5m', :first_in => 0 do
     end
   end
 
+  # TODO: if all games aren't on same day, will not turn off!
   if games.map { |g| g[:game_finished] }.all? then exit end
 end
 scheduler.join
