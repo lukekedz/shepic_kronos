@@ -5,6 +5,9 @@ namespace :connect do
 
   task :sync do |t, args|
     ruby 'synchro.rb' + ' ' + ENV['ANYONG']
+  end
+
+  task :score do |t, args|
     ruby 'live_scoring.rb' + ' ' + ENV['ANYONG']
   end
 end
