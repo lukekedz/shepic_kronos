@@ -56,8 +56,6 @@ if game_slate && game_slate.parsed_response != nil
   end
 
   if game_sched_today
-    # system "ruby live_scoring.rb #{ENV['ANYONG']}"
-
     game_slate.each do |game|
       game_date    = game_date(game['date'])
       game_started = game['game_started']
@@ -79,7 +77,7 @@ if game_slate && game_slate.parsed_response != nil
         log.info 'GAME ID: ' + updated_game_record.parsed_response['id'].to_s + ' => started... ' + updated_game_record.parsed_response['game_started'].to_s
         log.info '*****'
 
-        system "echo 'game locked.' | mail -s 'Raspi Shepic Log File' lukekedziora@gmail.com -A logger/log_#{stamp}.txt"
+        # system "echo 'game locked.' | mail -s 'Raspi Shepic Log File' lukekedziora@gmail.com -A logger/log_#{stamp}.txt"
       end
       log.info output.new_line
     end
