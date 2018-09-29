@@ -42,6 +42,8 @@ if weekly_game_slate && weekly_game_slate.parsed_response != nil
   end
 
   if game_sched_today
+    system "echo 'live scoring activated!' | mail -s 'SHEPIC: Live Scoring Activated!' lukekedziora@gmail.com"
+
     active_week = HTTParty.get('https://shepic.herokuapp.com/admin/week_number_for_scripts', :body => { :secret => ARGV[0] })
     games = []
     weekly_game_slate.each do |game|
@@ -165,6 +167,8 @@ if weekly_game_slate && weekly_game_slate.parsed_response != nil
                 :away_pts => away_pts,
                 :home_pts => home_pts,
               })
+
+              system "echo 'Game complete: #{away_team} #{away_pts}, #{home_team} #{home_pts}' | mail -s 'SHEPIC: Game Complete!' lukekedziora@gmail.com"
             end
           end
 

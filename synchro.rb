@@ -7,8 +7,7 @@ log       = Logger.new("./logger/log_#{stamp}.txt", 10, 1024000)
 log.level = Logger::INFO
 output    = PrettifyLogOutput.new
 
-# TODO: retry if URL doesn't resolve, on GET and POST
-# TODO: implement emailing
+# TODO: retry if URL doesn't resolve, on GET and POST, and alert for error!
 # TODO: automatic environment detection (no manual switch from localhost to herokuapp.com)
 
 def game_date(date)
