@@ -130,9 +130,9 @@ scheduler.every '1m', :first_in => 0, :overlap => false do
   end # Nokogiri::HTML(scrape) conditional
 
   finished_html_elements = nil
-  (1..3).each do |t|
-    if Nokogiri::HTML(scrape).css("#scoreboard-group-2 div:nth-child(#{t}) div").at('h3').text == 'Finished'
-      finished_html_elements = Nokogiri::HTML(scrape).css("#scoreboard-group-2 div:nth-child(#{t}) ul li").css('div')
+  (1..3).each do |n|
+    if Nokogiri::HTML(scrape).css("#scoreboard-group-2 div:nth-child(#{n}) div").at('h3').text == 'Finished'
+      finished_html_elements = Nokogiri::HTML(scrape).css("#scoreboard-group-2 div:nth-child(#{n}) ul li").css('div')
       break
     end
   end
