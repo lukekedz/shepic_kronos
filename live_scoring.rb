@@ -61,7 +61,8 @@ scheduler = Rufus::Scheduler.new
 scheduler.every '1m', :first_in => 0, :overlap => false do
   puts '*'*10 + '  ' + Time.now.to_s + '  ' + '*'*10
 
-  scrape = HTTParty.get("https://sports.yahoo.com/college-football/scoreboard/?confId=1%2C4%2C6%2C7%2C8%2C11%2C71%2C72%2C87%2C90%2C122&schedState=2&dateRange=#{active_week['week']}", headers: {"Cache-Control" => "no-cache"})
+  # scrape = HTTParty.get("https://sports.yahoo.com/college-football/scoreboard/?confId=1%2C4%2C6%2C7%2C8%2C11%2C71%2C72%2C87%2C90%2C122&schedState=2&dateRange=#{active_week['week']}", headers: {"Cache-Control" => "no-cache"})
+  scrape = HTTParty.get("https://sports.yahoo.com/college-football/scoreboard/", headers: {"Cache-Control" => "no-cache"})
 
   if Nokogiri::HTML(scrape).css('#scoreboard-group-2 div div').at('h3').text == 'Live'
     time_remaining, away_team, home_team, away_pts, home_pts = nil
