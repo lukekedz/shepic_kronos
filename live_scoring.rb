@@ -28,6 +28,7 @@ def parse_points_from_attribute(attribute)
   attribute.css('span').first.text
 end
 
+=begin
 # mirroring synchro's setup: is there a game today?
 todays_date      = Date.today
 game_sched_today = false
@@ -56,6 +57,7 @@ weekly_game_slate.each do |game|
   }
   games.push details
 end
+=end
 
 scheduler = Rufus::Scheduler.new
 scheduler.every '1m', :first_in => 0, :overlap => false do
@@ -64,9 +66,25 @@ scheduler.every '1m', :first_in => 0, :overlap => false do
   # scrape = HTTParty.get("https://sports.yahoo.com/college-football/scoreboard/?confId=1%2C4%2C6%2C7%2C8%2C11%2C71%2C72%2C87%2C90%2C122&schedState=2&dateRange=#{active_week['week']}", headers: {"Cache-Control" => "no-cache"})
   scrape = HTTParty.get("https://sports.yahoo.com/college-football/scoreboard/", headers: {"Cache-Control" => "no-cache"})
 
-  if Nokogiri::HTML(scrape).css('#scoreboard-group-2 div div').at('h3').text == 'Live'
+  live_html_elements = nil
+  finished_html_elements = nil
+
+  (0..3).each do |n|
+    # puts Nokogiri::HTML(scrape).css("#scoreboard-group-2 div:nth-child(#{n}) div").at('h1').text
+
+    if Nokogiri::HTML(scrape).css("#scoreboard-group-2 div:nth-child(#{n}) div").at('h1').text == 'Live'
+      live_html_elements = Nokogiri::HTML(scrape).css('#scoreboard-group-2 div ul li').css('div')
+    end
+
+    if Nokogiri::HTML(scrape).css("#scoreboard-group-2 div:nth-child(#{n}) div").at('h1').text == 'Finished'
+      finished_html_elements = Nokogiri::HTML(scrape).css("#scoreboard-group-2 div:nth-child(#{n}) ul li").css('div')
+    end
+  end
+
+  # if Nokogiri::HTML(scrape).css('#scoreboard-group-2 div div').at('h3').text == 'Live'
+  if live_html_elements != nil
     time_remaining, away_team, home_team, away_pts, home_pts = nil
-    live_html_elements = Nokogiri::HTML(scrape).css('#scoreboard-group-2 div ul li').css('div')
+    # live_html_elements = Nokogiri::HTML(scrape).css('#scoreboard-group-2 div ul li').css('div')
 
     live_html_elements.each do |el|
       # TIME REMAINING
@@ -103,40 +121,34 @@ scheduler.every '1m', :first_in => 0, :overlap => false do
         # puts 'AWAY: ' +  away_pts.to_s.ljust(3, ' ') + away_team
         # puts 'HOME: ' +  home_pts.to_s.ljust(3, ' ') + home_team
 
-        games.each do |g|
-          next if g[:game_finished] == true
+        # games.each do |g|
+        #   next if g[:game_finished] == true
 
-          if away_team == g[:away_team] && home_team == g[:home_team]
-            puts
-            puts 'TIME: ' + time_remaining.to_s
-            puts 'AWAY: ' +  away_pts.to_s.ljust(3, ' ') + away_team
-            puts 'HOME: ' +  home_pts.to_s.ljust(3, ' ') + home_team
+        #   if away_team == g[:away_team] && home_team == g[:home_team]
+        #     puts
+        #     puts 'TIME: ' + time_remaining.to_s
+        #     puts 'AWAY: ' +  away_pts.to_s.ljust(3, ' ') + away_team
+        #     puts 'HOME: ' +  home_pts.to_s.ljust(3, ' ') + home_team
 
-            response = HTTParty.post('https://shepic.herokuapp.com/admin/update_score', :body => {
-              :secret         => ARGV[0],
-              :id             => g[:id],
-              :game_finished  => false,
-              :time_remaining => time_remaining,
-              :away_pts       => away_pts,
-              :home_pts       => home_pts,
-            })
-          else
-            # puts 'NO MATCH! ... AWAY: ' + away_team + '  HOME: ' + home_team
-          end
-        end
+        #     response = HTTParty.post('https://shepic.herokuapp.com/admin/update_score', :body => {
+        #       :secret         => ARGV[0],
+        #       :id             => g[:id],
+        #       :game_finished  => false,
+        #       :time_remaining => time_remaining,
+        #       :away_pts       => away_pts,
+        #       :home_pts       => home_pts,
+        #     })
+        #   else
+        #     # puts 'NO MATCH! ... AWAY: ' + away_team + '  HOME: ' + home_team
+        #   end
+        # end
 
         time_remaining, away_team, home_team, away_pts, home_pts = nil
       end
     end # live_html_elements.each
   end # Nokogiri::HTML(scrape) conditional
 
-  finished_html_elements = nil
-  (1..3).each do |n|
-    if Nokogiri::HTML(scrape).css("#scoreboard-group-2 div:nth-child(#{n}) div").at('h3').text == 'Finished'
-      finished_html_elements = Nokogiri::HTML(scrape).css("#scoreboard-group-2 div:nth-child(#{n}) ul li").css('div')
-      break
-    end
-  end
+
 
   if finished_html_elements != nil
     time_remaining, away_team, home_team, away_pts, home_pts = nil
@@ -169,31 +181,31 @@ scheduler.every '1m', :first_in => 0, :overlap => false do
          away_pts       != nil &&
          home_pts       != nil
 
-        games.each do |g|
-          next if g[:game_finished] == true
+        # games.each do |g|
+        #   next if g[:game_finished] == true
 
-          if away_team == g[:away_team] && home_team == g[:home_team]
-            g[:game_finished] = (time_remaining == 'Final' || time_remaining == 'Final OT'  ? true : false)
+        #   if away_team == g[:away_team] && home_team == g[:home_team]
+        #     g[:game_finished] = (time_remaining == 'Final' || time_remaining == 'Final OT'  ? true : false)
 
-            HTTParty.post('https://shepic.herokuapp.com/admin/update_score', :body => {
-              :secret => ARGV[0],
-              :id => g[:id],
-              :game_finished => g[:game_finished],
-              :time_remaining => time_remaining,
-              :away_pts => away_pts,
-              :home_pts => home_pts,
-            })
+        #     HTTParty.post('https://shepic.herokuapp.com/admin/update_score', :body => {
+        #       :secret => ARGV[0],
+        #       :id => g[:id],
+        #       :game_finished => g[:game_finished],
+        #       :time_remaining => time_remaining,
+        #       :away_pts => away_pts,
+        #       :home_pts => home_pts,
+        #     })
 
-            system "echo 'Game complete: #{away_team} #{away_pts}, #{home_team} #{home_pts}' | mail -s 'SHEPIC: Game Complete!' lukekedziora@gmail.com"
-          end
-        end
+        #     system "echo 'Game complete: #{away_team} #{away_pts}, #{home_team} #{home_pts}' | mail -s 'SHEPIC: Game Complete!' lukekedziora@gmail.com"
+        #   end
+        # end
 
         time_remaining, away_team, home_team, away_pts, home_pts = nil
       end
     end # finished_html_elements.each
   end # Nokogiri::HTML(scrape) conditional
 
-  if games.map { |g| g[:game_finished] }.all? then exit end
+  # if games.map { |g| g[:game_finished] }.all? then exit end
 
   puts
   cache_buster = (5..20).to_a.sample
