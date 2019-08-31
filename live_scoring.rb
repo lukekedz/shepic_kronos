@@ -203,12 +203,10 @@ scheduler.every '1m', :first_in => 0, :overlap => false do
 
   if games.map { |g| g[:game_finished] }.all? then exit end
 
-  puts
-  puts 'SLEEP: 5 minutes'
-  sleep(5)
-
   # cache_buster = (5..20).to_a.sample
-  # puts 'SLEEP: ' + cache_buster.to_s + ' minutes'
+  cache_buster = 5
+  puts 'SLEEP: ' + cache_buster.to_s + ' minutes'
+  sleep(cache_buster*60)
   # sleep( ( (cache_buster*60) + ((0..60).to_a.sample) ) )
 end
 scheduler.join
