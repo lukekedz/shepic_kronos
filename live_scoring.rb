@@ -189,7 +189,8 @@ scheduler.every '1m', :first_in => 0, :overlap => false do
               :game_finished => g[:game_finished],
               :time_remaining => time_remaining,
               :away_pts => away_pts,
-              :home_pts => home_pts
+              :home_pts => home_pts,
+              :spread => g[:spread]
             })
 
             system "echo 'Game complete: #{away_team} #{away_pts}, #{home_team} #{home_pts}' | mail -s 'SHEPIC: Game Complete!' lukekedziora@gmail.com"
